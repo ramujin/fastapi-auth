@@ -1,4 +1,4 @@
-# FastAPI Full-Stack REST Demo
+# FastAPI Full-Stack Auth Demo
 
 This repo is a full-stack app using the [FastAPI web framework](https://fastapi.tiangolo.com), MySQL for a database, and REST to interact with a simple users table. You may install MySQL natively or use the included Docker file to create a database in a containter. The `init-db.sql` defines a simple schema for use with the example.
 
