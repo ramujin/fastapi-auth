@@ -1,0 +1,82 @@
+body {
+  background: #222;
+  margin: 2rem;
+  color: #eee;
+  font-size: 1.5rem;
+  font-family: sans-serif;
+}
+
+.container > * {
+  display: none;
+}
+
+.container[data-mode='viewing'] > .table_view {
+  display:block;
+  margin-top: 6rem;
+  box-shadow: 0 0 1rem rgba(255,255,255,0.15);
+}
+
+.container[data-mode='editing'] > .edit_view {
+  display:block;
+  margin-top: 6rem;
+  box-shadow: 0 0 0.25rem rgba(255,255,255,0.15);
+}
+
+.grid_table .header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 2fr 3rem 3rem;
+  background-color: #449ee3;
+  color: #ffffff;
+  text-align: left;
+  padding: 1rem 1rem;
+}
+
+.grid_table .row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr 2fr 3rem 3rem;
+  background-color: #555555;
+  padding: 0.5rem 1rem;
+
+}
+
+.grid_table .row:nth-child(odd) {
+  background-color: #454545;
+}
+
+.form_row {
+  margin-top: 0.25rem;
+  display:block;
+  padding: 1rem;
+  background-color: #333;
+}
+
+.form_row input {
+  padding: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.form_row input[type=submit] {
+  padding: 0.5rem;
+  background-color: #449ee3;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.form_row .save_button {
+  padding: 0.5rem;
+  background-color: #449ee3;
+  border: 3px solid #555;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.form_row .cancel_button {
+  padding: 0.5rem;
+  background-color: #555;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.edit:hover, .delete:hover {
+  cursor: pointer;
+}

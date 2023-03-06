@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>ECE 140A Full Stack Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel='stylesheet' type='text/css' href='public/rest.css'>
+    <script src="public/rest.js" defer></script>
+  </head>
+  <body>
+
+    <h1>Our All-Star Cast</h1>
+
+    <main class='container' data-mode='viewing'>
+
+      <div class='edit_view'>
+        <form name='edit_user' action='' method='PUT' data-id=''>
+          <div class='form_row'>
+            <input type='text' name='first_name' placeholder='First Name' value='' autofocus>
+            <input type='text' name='last_name' placeholder='Last Name' value=''>
+            <input type='text' name='username' placeholder='Username' value=''>
+            <input type='password' name='password' placeholder='********'>
+            <span class='cancel_button'>Cancel</span>
+            <span class='save_button'>Save</span>
+          </div>
+        </form>
+      </div>
+
+      <div class='table_view'>
+        <div class='grid_table'>
+          <div class='header'>
+            <span> ID </span>
+            <span> First Name </span>
+            <span> Last Name </span>
+            <span> Username </span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <!-- Rows will dynamically populate -->
+          {# loop through the records and render them #}
+          {% for user in users %}
+          <div class='row' data-id='{{ user[0] }}'>
+            <span> {{ user[0] }} </span>
+            <span> {{ user[1] }} </span>
+            <span> {{ user[2] }} </span>
+            <span> {{ user[3] }} </span>
+            <span class='edit_button' title='Edit User'> &#x270e; </span>
+            <span class='delete_button' title='Delete User'> &#x232b; </span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <form name='add_user' action='/users' method='POST'>
+          <div class='form_row'>
+            <input type='text' name='first_name' placeholder='First Name' autofocus>
+            <input type='text' name='last_name' placeholder='Last Name'>
+            <input type='text' name='username' placeholder='Username'>
+            <input type='password' name='password' placeholder='Password'>
+            <input type='submit' value='Add New User'>
+          </div>
+        </form>
+      </div>
+
+  </main>
+
+   <template id='new_row'>
+    <div class='row' data-id=''>
+      <span> </span>
+      <span> </span>
+      <span> </span>
+      <span> </span>
+      <span class='edit_button' title='Edit User'> &#x270e; </span>
+      <span class='delete_button' title='Delete User'> &#x232b; </span>
+    </div>
+  </template>
+
+  </body>
+</html>
