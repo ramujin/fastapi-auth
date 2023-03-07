@@ -65,7 +65,6 @@ def post_login(visitor:Visitor, request:Request, response:Response) -> dict:
 
 @app.post('/logout')
 def post_logout(request:Request, response:Response) -> dict:
-  # End session and delete cookie
   sessions.end_session(request, response)
   return {'message': 'Logout successful', 'session_id': 0}
 
@@ -97,7 +96,6 @@ def get_sessions(request:Request) -> dict:
 @app.get('/', response_class=HTMLResponse)
 def get_index(request:Request) -> HTMLResponse:
   return views.TemplateResponse('index.html', {'request':request, 'users':db.select_users()})
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # RESTful User Routes
