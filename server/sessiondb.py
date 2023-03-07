@@ -17,7 +17,7 @@ class SessionManager:
     response.set_cookie(key="session_id", value=session_id, httponly=True)
     return session_id
 
-  def get_session(self, request:Request) -> dict | None:
+  def get_session(self, request:Request) -> dict:
     session_id = request.cookies.get("session_id")
     return self.db.read(session_id)
 
@@ -43,9 +43,9 @@ class SessionDBManager:
     cursor.close()
     db.close()
 
-  def read(self, session_id:str) -> dict | None:
+  def read(self, session_id:str) -> dict:
     if session_id is None:
-      return None
+      return {}
 
     db = mysql.connect(**self.db_config)
     cursor = db.cursor()
@@ -58,14 +58,14 @@ class SessionDBManager:
     db.close()
 
     if result is None:
-      return None
+      return {}
 
     # invalidate session if expired
     session_data, created_at = result
     elapsed = (datetime.utcnow() - created_at).total_seconds()
     if elapsed > self.expiry:
       self.delete(session_id)
-      return None
+      return {}
 
     return json.loads(session_data)
 

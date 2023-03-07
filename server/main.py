@@ -31,7 +31,7 @@ def authenticate_user(username:str, password:str) -> bool:
 @app.post("/login")
 def login(username:str, password:str, request:Request, response:Response):
   session = session_manager.get_session(request)
-  if session is not None:
+  if len(session) > 0:
     return {"message": "Already logged in"}
 
   # Authenticate the user here
@@ -54,7 +54,7 @@ def protected_route(request:Request):
   # Get session data
   session = session_manager.get_session(request)
   # Check if user is logged in
-  if session and session.get("logged_in"):
+  if len(session) > 0 and session.get("logged_in"):
     return {"message": "Access granted"}
   else:
     return {"message": "Access denied"}

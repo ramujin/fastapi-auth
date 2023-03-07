@@ -16,10 +16,11 @@ class SessionManager:
     response.set_cookie(key="session_id", value=session_id, httponly=True)
     return session_id
 
-  def get_session(self, request:Request) -> dict | None:
+  def get_session(self, request:Request) -> dict:
     session_id = request.cookies.get("session_id")
     if session_id is not None:
       return self.sessions.get(session_id)
+    return {}
 
   def end_session(self, request: Request, response: Response) -> None:
     session_id = request.cookies.get("session_id")
