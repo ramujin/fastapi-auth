@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>ECE 140A Full Stack Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel='stylesheet' type='text/css' href='public/rest.css'>
+    <script src="public/login.js" defer></script>
+  </head>
+  <body>
+
+    <h1>Welcome to your home page!</h1>
+
+    <main>
+      <h2> Here is your session data... </h2>
+      <div> Session ID: {{ session_id }} </div>
+      <div> Username: {{ session['username'] }} </div>
+      <div> Logged In Status: {{ session['logged_in'] }} </div>
+      <div>
+        <div class='logout_button'> Logout </div>
+      </div>
+    </main>
+  </body>
+</html>

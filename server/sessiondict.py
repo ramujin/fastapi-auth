@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import secrets
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-class SessionManager:
+class Sessions:
   def __init__(self, secret_key:str, expiry:int=30):
     self.sessions = {}
     self.secret_key = secret_key

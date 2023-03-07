@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>ECE 140A Full Stack Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel='stylesheet' type='text/css' href='public/rest.css'>
+    <script src="public/login.js" defer></script>
+  </head>
+  <body>
+
+    <h1>Welcome, Please Login</h1>
+
+    <main>
+      <form name='login_form' action='/login' method='POST'>
+        <div class='form_row'>
+          <input type='text' name='username' placeholder='Username'>
+          <input type='password' name='password' placeholder='Password'>
+          <input type='submit' value='Login'>
+        </div>
+      </form>
+    </main>
+
+  </body>
+</html>

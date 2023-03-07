@@ -8,8 +8,8 @@ from fastapi.staticfiles import StaticFiles       # Used for making static resou
 import uvicorn                                    # Used for running the app directly through Python
 import dbutils as db                              # Import helper module of database functions!
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from sessiondb import SessionManager
-# from sessiondict import SessionManager
+from sessiondb import Sessions
+# from sessiondict import Sessions
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Configuration
@@ -18,58 +18,8 @@ views = Jinja2Templates(directory='views')        # Specify where the HTML files
 static_files = StaticFiles(directory='public')    # Specify where the static files are located
 app.mount('/public', static_files, name='public') # Mount the static files directory to /public
 
-session_manager = SessionManager(db.db_config, secret_key=db.session_config['session_key'], expiry=3600)
-# session_manager = SessionManager(secret_key=db.session_config['session_key'])
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# A function to authenticate users when trying to login or use protected routes
-def authenticate_user(username:str, password:str) -> bool:
-  return db.check_user_password(username, password)
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Authentication routes (login, logout, and a protected route for testing)
-@app.post("/login")
-def login(username:str, password:str, request:Request, response:Response):
-  session = session_manager.get_session(request)
-  if len(session) > 0:
-    return {"message": "Already logged in"}
-
-  # Authenticate the user here
-  if authenticate_user(username, password):
-    # Store session data
-    session_data = {"username": username, "logged_in": True}
-    session_id = session_manager.create_session(response, session_data)
-    return {"message": "Login successful", "session_id": session_id}
-  else:
-    return {"message": "Invalid username or password"}
-
-@app.post("/logout")
-def logout(request:Request, response:Response):
-  # End session and delete cookie
-  session_manager.end_session(request, response)
-  return {"message": "Logout successful"}
-
-@app.get("/protected")
-def protected_route(request:Request):
-  # Get session data
-  session = session_manager.get_session(request)
-  # Check if user is logged in
-  if len(session) > 0 and session.get("logged_in"):
-    return {"message": "Access granted"}
-  else:
-    return {"message": "Access denied"}
-
-# GET /sessions
-@app.get('/sessions')
-def get_sessions(request:Request) -> dict:
-  return session_manager.get_session(request)
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Home route to load the main page in a templatized fashion
-# GET /
-@app.get('/', response_class=HTMLResponse)
-def get_home(request:Request) -> HTMLResponse:
-  return views.TemplateResponse('index.html', {'request':request, 'users':db.select_users()})
+sessions = Sessions(db.db_config, secret_key=db.session_config['session_key'], expiry=3600)
+# sessions = Sessions(secret_key=db.session_config['session_key'])
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define a User class that matches the SQL schema we defined for our users
@@ -78,6 +28,76 @@ class User(BaseModel):
   last_name: str
   username: str
   password: str
+
+class Visitor(BaseModel):
+  username: str
+  password: str
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# A function to authenticate users when trying to login or use protected routes
+def authenticate_user(username:str, password:str) -> bool:
+  return db.check_user_password(username, password)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Authentication routes (login, logout, and a protected route for testing)
+@app.get('/login')
+def get_login(request:Request) -> HTMLResponse:
+  with open("views/login.html") as html:
+    return HTMLResponse(content=html.read())
+
+@app.post('/login')
+def post_login(visitor:Visitor, request:Request, response:Response) -> dict:
+  username = visitor.username
+  password = visitor.password
+
+  # Invalidate previous session if logged in
+  session = sessions.get_session(request)
+  if len(session) > 0:
+    sessions.end_session(request, response)
+
+  # Authenticate the user
+  if authenticate_user(username, password):
+    session_data = {'username': username, 'logged_in': True}
+    session_id = sessions.create_session(response, session_data)
+    return {'message': 'Login successful', 'session_id': session_id}
+  else:
+    return {'message': 'Invalid username or password', 'session_id': 0}
+
+@app.post('/logout')
+def post_logout(request:Request, response:Response) -> dict:
+  # End session and delete cookie
+  sessions.end_session(request, response)
+  return {'message': 'Logout successful', 'session_id': 0}
+
+@app.get('/home', response_class=HTMLResponse)
+def get_home(request:Request) -> HTMLResponse:
+  session = sessions.get_session(request)
+  if len(session) > 0 and session.get('logged_in'):
+    session_id = request.cookies.get("session_id")
+    return views.TemplateResponse('home.html', {'request':request, 'session':session, 'session_id':session_id})
+  else:
+    return get_login(request)
+
+@app.get('/protected')
+def get_protected(request:Request) -> dict:
+  session = sessions.get_session(request)
+  if len(session) > 0 and session.get('logged_in'):
+    return {'message': 'Access granted'}
+  else:
+    return {'message': 'Access denied'}
+
+# GET /sessions
+@app.get('/sessions')
+def get_sessions(request:Request) -> dict:
+  return sessions.get_session(request)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Index route to load the main page in a templatized fashion
+# GET /
+@app.get('/', response_class=HTMLResponse)
+def get_index(request:Request) -> HTMLResponse:
+  return views.TemplateResponse('index.html', {'request':request, 'users':db.select_users()})
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # RESTful User Routes

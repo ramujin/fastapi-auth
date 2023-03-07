@@ -5,9 +5,9 @@ import secrets, json
 from datetime import datetime, timezone
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-class SessionManager:
+class Sessions:
   def __init__(self, db_config:dict, secret_key:str, expiry:int=3600) -> None:
-    self.db = SessionDBManager(db_config, expiry)
+    self.db = SessionStore(db_config, expiry)
     self.db_config = db_config
     self.secret_key = secret_key
 
@@ -27,7 +27,7 @@ class SessionManager:
     response.delete_cookie(key="session_id")
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-class SessionDBManager:
+class SessionStore:
   def __init__(self, db_config:dict, expiry:int) -> None:
     self.db_config = db_config
     self.expiry = expiry

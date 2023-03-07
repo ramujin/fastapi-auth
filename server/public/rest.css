@@ -80,3 +80,12 @@ body {
 .edit:hover, .delete:hover {
   cursor: pointer;
 }
+
+.logout_button {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: #555;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: inline-block;
+}
