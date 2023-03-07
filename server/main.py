@@ -59,6 +59,11 @@ def protected_route(request:Request):
   else:
     return {"message": "Access denied"}
 
+# GET /sessions
+@app.get('/sessions')
+def get_sessions(request:Request) -> dict:
+  return session_manager.get_session(request)
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Home route to load the main page in a templatized fashion
 # GET /
