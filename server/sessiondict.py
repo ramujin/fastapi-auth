@@ -13,7 +13,7 @@ class Sessions:
   def create_session(self, response:Response, session_data:dict) -> str:
     session_id = secrets.token_urlsafe(16)
     self.sessions[session_id] = session_data
-    response.set_cookie(key="session_id", value=session_id, httponly=True)
+    response.set_cookie(key="session_id", value=session_id)
     return session_id
 
   def get_session(self, request:Request) -> dict:

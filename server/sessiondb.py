@@ -14,7 +14,7 @@ class Sessions:
   def create_session(self, response:Response, session_data:dict) -> str:
     session_id = secrets.token_urlsafe(16)
     self.db.create(session_id, session_data)
-    response.set_cookie(key="session_id", value=session_id, httponly=True)
+    response.set_cookie(key="session_id", value=session_id)
     return session_id
 
   def get_session(self, request:Request) -> dict:
@@ -60,7 +60,7 @@ class SessionStore:
     if result is None:
       return {}
 
-    # invalidate session if expired
+    # Invalidate the session if it has expired; expiry is in units of seconds
     session_data, created_at = result
     elapsed = (datetime.utcnow() - created_at).total_seconds()
     if elapsed > self.expiry:

@@ -1,6 +1,7 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Necessary Imports
 from fastapi import FastAPI, Request, Response    # The main FastAPI import and Request/Response objects
+from fastapi.responses import RedirectResponse    # Used to redirect to another route
 from pydantic import BaseModel                    # Used to define the model matching the DB Schema
 from fastapi.responses import HTMLResponse        # Used for returning HTML responses (JSON is default)
 from fastapi.templating import Jinja2Templates    # Used for generating HTML from templatized files
@@ -75,7 +76,7 @@ def get_home(request:Request) -> HTMLResponse:
     session_id = request.cookies.get("session_id")
     return views.TemplateResponse('home.html', {'request':request, 'session':session, 'session_id':session_id})
   else:
-    return get_login(request)
+    return RedirectResponse(url="/login", status_code=302)
 
 @app.get('/protected')
 def get_protected(request:Request) -> dict:
