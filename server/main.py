@@ -9,8 +9,6 @@ from fastapi.staticfiles import StaticFiles       # Used for making static resou
 import uvicorn                                    # Used for running the app directly through Python
 import dbutils as db                              # Import helper module of database functions!
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from sessiondb import Sessions
-# from sessiondict import Sessions
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Configuration
@@ -19,8 +17,13 @@ views = Jinja2Templates(directory='views')        # Specify where the HTML files
 static_files = StaticFiles(directory='public')    # Specify where the static files are located
 app.mount('/public', static_files, name='public') # Mount the static files directory to /public
 
-sessions = Sessions(db.db_config, secret_key=db.session_config['session_key'], expiry=3600)
-# sessions = Sessions(secret_key=db.session_config['session_key'])
+# Use MySQL for storing session data
+from sessiondb import Sessions
+sessions = Sessions(db.db_config, secret_key=db.session_config['session_key'], expiry=600)
+
+# Use in-memory dictionary to store session data – CAUTION: all sessions are deleted upon server restart
+# from sessiondict import Sessions
+# sessions = Sessions(secret_key=db.session_config['session_key'], expiry=600)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define a User class that matches the SQL schema we defined for our users
@@ -74,7 +77,8 @@ def get_home(request:Request) -> HTMLResponse:
   session = sessions.get_session(request)
   if len(session) > 0 and session.get('logged_in'):
     session_id = request.cookies.get("session_id")
-    return views.TemplateResponse('home.html', {'request':request, 'session':session, 'session_id':session_id})
+    template_data = {'request':request, 'session':session, 'session_id':session_id}
+    return views.TemplateResponse('home.html', template_data)
   else:
     return RedirectResponse(url="/login", status_code=302)
 

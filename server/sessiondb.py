@@ -2,14 +2,22 @@
 import mysql.connector as mysql
 from fastapi import Request, Response
 import secrets, json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import threading, time
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class Sessions:
   def __init__(self, db_config:dict, secret_key:str, expiry:int=3600) -> None:
+    self.expiry = expiry
     self.db = SessionStore(db_config, expiry)
     self.db_config = db_config
     self.secret_key = secret_key
+    self.expiry_process = threading.Thread(target=self.auto_expire, args=(expiry,), daemon=True)
+    self.expiry_process.start()
+
+  def __del__(self):
+    self.stop_thread = True
+    self.expiry_process.join()
 
   def create_session(self, response:Response, session_data:dict) -> str:
     session_id = secrets.token_urlsafe(16)
@@ -26,6 +34,12 @@ class Sessions:
     self.db.delete(session_id)
     response.delete_cookie(key="session_id")
 
+  def auto_expire(self, expiry) -> None:
+    while True:
+      time.sleep(expiry)
+      self.db.delete_expired()
+      print('[LOGGING] deleted expired sessions')
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class SessionStore:
   def __init__(self, db_config:dict, expiry:int) -> None:
@@ -36,7 +50,7 @@ class SessionStore:
     db = mysql.connect(**self.db_config)
     cursor = db.cursor()
 
-    query = "insert into sessions (session_id, session_data) values (%s, %s)"
+    query = "insert into sessions (session_id, session_data) values (%s, %s);"
     cursor.execute(query, (session_id, json.dumps(session_data)))
     db.commit()
 
@@ -50,7 +64,7 @@ class SessionStore:
     db = mysql.connect(**self.db_config)
     cursor = db.cursor()
 
-    query = "select session_data, created_at from sessions where session_id = %s"
+    query = "select session_data, created_at from sessions where session_id = %s;"
     cursor.execute(query, (session_id,))
     result = cursor.fetchone()
 
@@ -74,9 +88,22 @@ class SessionStore:
       db = mysql.connect(**self.db_config)
       cursor = db.cursor()
 
-      query = "delete from sessions where session_id = %s"
+      query = "delete from sessions where session_id = %s;"
       cursor.execute(query, (session_id,))
       db.commit()
 
       cursor.close()
       db.close()
+
+  def delete_expired(self) -> None:
+    db = mysql.connect(**self.db_config)
+    cursor = db.cursor()
+
+    session_age = datetime.utcnow() - timedelta(seconds=self.expiry)
+    query = "delete from sessions where created_at < %s;"
+    cursor.execute(query, (session_age,))
+    db.commit()
+
+    cursor.close()
+    db.close()
+
