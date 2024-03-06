@@ -2,16 +2,15 @@
 import mysql.connector as mysql
 from fastapi import Request, Response
 import secrets, json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 import threading, time
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class Sessions:
-  def __init__(self, db_config:dict, secret_key:str, expiry:int=3600) -> None:
+  def __init__(self, db_config:dict, expiry:int=3600) -> None:
     self.expiry = expiry
     self.db = SessionStore(db_config, expiry)
     self.db_config = db_config
-    self.secret_key = secret_key
     self.expiry_process = threading.Thread(target=self.auto_expire, args=(expiry,), daemon=True)
     self.expiry_process.start()
 
@@ -106,4 +105,3 @@ class SessionStore:
 
     cursor.close()
     db.close()
-

@@ -1,14 +1,12 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi import Request, Response
 import secrets
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class Sessions:
-  def __init__(self, secret_key:str, expiry:int=3600) -> None:
+  def __init__(self, expiry:int=3600) -> None:
     self.sessions = {}
-    self.secret_key = secret_key
-    self.expiry = expiry # TODO: this is not implemented for dictionary sessions or else we would have a cache!
+    self.expiry = expiry # TODO: this is not implemented for dictionary sessions yet. if it was, it would be a cache!
 
   def create_session(self, response:Response, session_data:dict) -> str:
     session_id = secrets.token_urlsafe(16)

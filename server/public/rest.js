@@ -52,8 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear the input form and bring focus to the first field again
       let inputs = add_form.querySelectorAll('input');
-      inputs[0].value = '';
-      inputs[1].value = '';
+      for (let i = 0; i < inputs.length-1; i++) {
+        inputs[i].value = '';
+      }
       inputs[0].focus();
     });
   });

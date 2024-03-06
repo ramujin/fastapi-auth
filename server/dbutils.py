@@ -14,9 +14,6 @@ db_config = {
   "password": os.environ['MYSQL_PASSWORD'],
   "database": os.environ['MYSQL_DATABASE']
 }
-session_config = {
-  'session_key': os.environ['SESSION_KEY']
-}
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define helper functions for CRUD operations

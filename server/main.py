@@ -8,7 +8,6 @@ from fastapi.templating import Jinja2Templates    # Used for generating HTML fro
 from fastapi.staticfiles import StaticFiles       # Used for making static resources available to server
 import uvicorn                                    # Used for running the app directly through Python
 import dbutils as db                              # Import helper module of database functions!
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Configuration
@@ -17,13 +16,13 @@ views = Jinja2Templates(directory='views')        # Specify where the HTML files
 static_files = StaticFiles(directory='public')    # Specify where the static files are located
 app.mount('/public', static_files, name='public') # Mount the static files directory to /public
 
-# Use MySQL for storing session data
-from sessiondb import Sessions
-sessions = Sessions(db.db_config, secret_key=db.session_config['session_key'], expiry=600)
+# # Use MySQL for storing session data
+# from sessiondb import Sessions
+# sessions = Sessions(db.db_config, expiry=600)
 
 # Use in-memory dictionary to store session data – CAUTION: all sessions are deleted upon server restart
-# from sessiondict import Sessions
-# sessions = Sessions(secret_key=db.session_config['session_key'], expiry=600)
+from sessiondict import Sessions
+sessions = Sessions(expiry=600)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define a User class that matches the SQL schema we defined for our users
