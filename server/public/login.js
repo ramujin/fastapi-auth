@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.session_id != 0) {
           location.replace('/home');
         }
+        else {
+          alert('Invalid Username or Password');
+        }
       });
     });
   }
